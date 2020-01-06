@@ -36,7 +36,8 @@ export default {
     name: '',
     login: null,
     pass: '',
-    password: null
+    password: null,
+    statusCodes: [401, 403, 404]
   }),
   methods: {
     ...mapActions([
@@ -49,17 +50,27 @@ export default {
     async auth (e) {
       e.preventDefault()
       const { data, status } = await this.loginAuth({ login: this.name, password: this.pass })
-      const { errors } = data
-      if (data.data) {
-        const token = data.data.access_token
-        const expiredAt = data.data.expires_at
+      const { data: response, errors } = data
+      if (response) {
+        const token = response.access_token
+        const expiredAt = response.expires_at
         localStorage.setItem('jwt', token)
         localStorage.setItem('expiredAt', expiredAt)
+        this.$router.replace('/')
       } else if (errors) {
         console.warn('...Catched, server status', status)
-        errors.forEach(item => {
-          this[item.source] = false
-        })
+        const isStatusCode = this.statusCodes.indexOf(status)
+        if (isStatusCode !== -1) {
+          this.$bvToast.toast(errors[0].title, {
+            title: `Status code ${this.statusCodes[isStatusCode]}`,
+            appendToast: true,
+            variant: 'danger'
+          })
+        } else {
+          errors.forEach(item => {
+            this[item.source] = false
+          })
+        }
       }
     }
   }
