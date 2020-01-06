@@ -1,10 +1,9 @@
 export function isExpired () {
   let isExpired = true
-  const expiredAt = localStorage.getItem('expiredAt')
-  if (expiredAt) {
-    const currentDateParse = Date.parse(new Date())
-    const expiredAtParse = Date.parse(expiredAt)
-    isExpired = currentDateParse > expiredAtParse
+  const parseExpiredAt = Date.parse(localStorage.getItem('expiredAt'))
+  if (parseExpiredAt) {
+    const parseCurrentDate = Date.parse(new Date())
+    isExpired = parseCurrentDate > parseExpiredAt
   }
   return isExpired
 }
